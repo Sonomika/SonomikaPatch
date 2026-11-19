@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400&display=swap" rel="stylesheet">
 <script src="app/preferences.js?v=mp4-export"></script>
-<link rel="stylesheet" href="styles/app.css?v=remove-eye-mode">
+<link rel="stylesheet" href="styles/app.css?v=fmt1">
 </head>
 <body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>
@@ -78,7 +78,7 @@
     <div class="visw" id="visw" hidden><div class="vis" id="vis"><canvas id="visc" role="img" aria-label="Four circles, each drawn from its own voice’s waveform: they wander apart in the random parts, gather in the groove and rotate in 3D later on"></canvas></div></div>
     <div class="flock-visuals" id="flockVisuals" hidden></div>
     <div class="scene-strip" id="sceneStrip">
-      <div class="scene-meta"><h1 class="fld scene-title" id="songTitle">Fibonacci</h1><span class="fld lcd" id="transportTime" role="group" aria-label="Elapsed time and total duration"><time id="elapsedTime" datetime="PT0S">0:00</time> / <time id="totalTime" datetime="PT0S">0:00</time></span></div>
+      <div class="scene-meta"><h1 class="fld scene-title" id="songTitle">Fibonacci</h1><span class="fld lcd" id="transportTime" role="group" aria-label="Elapsed time and total duration"><time id="elapsedTime" datetime="PT0S">0:00</time> / <time id="totalTime" datetime="PT0S">0:00</time></span><span class="fmt-sel" id="fmtSel" role="group" aria-label="Video format" hidden></span></div>
       <nav class="sections" id="sections" aria-label="Scenes: tap to jump"></nav>
     </div>
   <div class="patch" id="patch"></div>
@@ -111,10 +111,10 @@
 <script defer src="views/mixer.js?v=free-dialogue"></script>
 <script defer src="engine/audio.js?v=fibonacci-rhythm"></script>
 <script defer src="views/live-ui.js?v=transport-duration"></script>
-<script defer src="views/library.js?v=remove-eye-mode"></script>
+<script defer src="views/library.js?v=fmt1"></script>
 <script defer src="app/portable-patch.js"></script>
 <script defer src="app/patch-files.js?v=remove-eye-mode"></script>
-<script defer src="app/app.js?v=remove-eye-mode"></script>
+<script defer src="app/app.js?v=fexp2"></script>
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
 <script type="module" src="engine/visuals.js?v=visual-frames"></script>
 <script type="module" src="patches/twoways/room3d.js"></script>

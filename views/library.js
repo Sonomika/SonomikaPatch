@@ -254,7 +254,15 @@ function route(){const h=pageRoute().replace(/-wires$/,''),grid=h.endsWith('-pat
 const ARTIST='SONOMIKA';
 function loadPatch(P){if(playing)stop();if(LUFS.matching)LUFS.match(false);LUFS.reset();if(P!==PATCH){mixerSelection='master';mixerSolos.clear();}PATCH=P;LEARN=null;setTimeout(renderMidi);$('songTitle').textContent=P.title.charAt(0)+P.title.slice(1).toLowerCase();stepIdx=0;computeSections();P.reset();
   if(bus?.drizzleReverb)bus.drizzleReverb.wet.gain.setTargetAtTime(P===P9?1.8:0,ctx.currentTime,.04);
-  $('bpmgrp').hidden=Boolean(P.stepSeconds);$('bpm').value=P.bpm??'';$('seedv').textContent=P.seed;
+  const tempo=$('bpm');
+  const hasTempo=Number.isFinite(P.bpm);
+  const tempoGroup=$('bpmgrp');
+  tempoGroup.hidden=!hasTempo;
+  const tempoRow=tempoGroup.closest('.mrow');
+  if(tempoRow)tempoRow.hidden=!hasTempo;
+  tempo.readOnly=Boolean(P.stepSeconds);
+  tempo.value=hasTempo?P.bpm:'';
+  $('seedv').textContent=P.seed;
   const brand = document.querySelector('.brand');
   brand.dataset.route = P.id;
   brand.href = '?view=patch&patch=' + encodeURIComponent(P.id);
@@ -266,7 +274,11 @@ function loadPatch(P){if(playing)stop();if(LUFS.matching)LUFS.match(false);LUFS.
   ZOOM=savedZoom??P.layoutDef?.zoom??1;
   $('zVal').textContent=Math.round(ZOOM*100)+'%';
   root.style.setProperty('--mz',ZOOM);
-  LOOPSI=null;renderSections();paintLoop();renderPatch();if(SEL)renderDetail();if(ctx){[...mixIds(),'rret','dret','vinylNoise'].forEach(applyStrip);applyMaster();}if(VIEW==='mixer')renderMixer();uiStep(0,0,0,P.sections[0],[]);if(P===P1)drawArr();renderList();}
+  LOOPSI=null;renderSections();paintLoop();renderPatch();if(SEL)renderDetail();if(ctx){[...mixIds(),'rret','dret','vinylNoise'].forEach(applyStrip);applyMaster();}if(VIEW==='mixer')renderMixer();uiStep(0,0,0,P.sections[0],[]);if(P===P1)drawArr();renderList();renderFormats();}
+// a patch made in two video formats shows a 16:9 / 9:16 selector beside the time
+function renderFormats(){const el=$('fmtSel');if(!el)return;const F=PATCH.formats;el.hidden=!F;if(!F){el.replaceChildren();return;}
+  el.replaceChildren(...F.map(f=>{const b=document.createElement('button');b.type='button';b.className='fld fmt-b';b.textContent=f;b.setAttribute('aria-pressed',String(PATCH.format===f));
+    b.onclick=()=>{if(PATCH.format===f)return;PATCH.setFormat(f);loadPatch(PATCH);};return b;}));}
 $('songList').onclick=e=>{
   const heading=e.target.closest('button[data-song-sort]');
   if(heading){

@@ -1,6 +1,6 @@
 # Sonomika Patch
 
-Serve this directory with a static web server. For local development, run `python -m http.server 8766` and open `http://127.0.0.1:8766/`.
+Sonomika Patch is a browser app for audio-visual patches. Each patch is a self-contained piece of code that generates its own music and visuals in real time, with a mixer, effects, MIDI control and video export. It is free and open code.
 
 Use **Save patch** to export a portable `.patch` with the player, patch code, settings, and media. Drop it onto Sonomika Patch or use **Open patch**. The isolated player uses CDN dependencies for icons, fonts, and 3D rendering. **Save preset** exports settings for the matching built-in patch. Opening a preset replaces its saved mixer settings and layout.
 

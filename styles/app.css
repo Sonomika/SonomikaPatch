@@ -419,3 +419,9 @@ html[data-frame="portrait"] .flock-visuals:has(.olympus-window){grid-template-co
 .export-dialog progress::-moz-progress-bar{background:var(--box)}
 .export-actions{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:6px}
 .export-actions a{text-decoration:none}
+/* the 16:9 / 9:16 selector for patches made in both video formats */
+.fmt-sel{display:inline-flex;gap:0;margin-left:6px;vertical-align:middle}
+.fmt-sel[hidden]{display:none}
+.fmt-sel .fmt-b{font:inherit;font-size:12px;letter-spacing:.04em;padding:0 10px;height:30px;background:transparent;color:#888;border:1px solid #444;cursor:pointer}
+.fmt-sel .fmt-b+.fmt-b{border-left:0}
+.fmt-sel .fmt-b[aria-pressed=true]{background:#eee;color:#000;border-color:#eee}

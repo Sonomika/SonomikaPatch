@@ -55,6 +55,7 @@ async function startVideoRecording(button){
     button.textContent='Recording format unavailable';
     return;
   }
+  if(patch.recordCanvas)return startCanvasRecording(button,patch,mimeType,idle);
   const video=document.createElement('video');
   video.muted=true;
   video.playsInline=true;
@@ -211,6 +212,36 @@ async function startVideoRecording(button){
     button.textContent=e.name==='NotAllowedError'||e.name==='AbortError'?idle:e.name==='CursorCaptureUnavailable'?'Cursor-free recording unavailable':'Recording failed · choose this tab';
   }
 }
+// a patch that composes its own frame (e.g. a 9:16 lockup) is recorded straight from that canvas: no tab capture, exact size
+async function startCanvasRecording(button,patch,mimeType,idle){
+  videoCapturePending=true;button.disabled=true;
+  const canvas=patch.recordCanvas(true),chunks=[];let watch,finish,failed=false,audioTap,stream;
+  const previousLoop=LOOPSI;
+  const cleanup=()=>{clearInterval(watch);clearTimeout(finish);if(audioTap){try{MST.trim.disconnect(audioTap);}catch(e){}}stream?.getTracks().forEach(t=>t.stop());
+    patch.recordCanvas(false);videoRecording=null;videoCapturePending=false;if(PATCH===patch){LOOPSI=previousLoop;paintLoop();}};
+  try{
+    if(!$('library').hidden||!$('midiView').hidden)go(patch.id);
+    await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
+    stream=canvas.captureStream(60);
+    initAudio();ctx.resume().catch(()=>{});
+    audioTap=ctx.createMediaStreamDestination();MST.trim.connect(audioTap);audioTap.stream.getAudioTracks().forEach(t=>stream.addTrack(t));
+    const recorder=new MediaRecorder(stream,{mimeType,videoBitsPerSecond:20_000_000,audioBitsPerSecond:192_000});
+    const title=patch.title.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/-+$/,'');
+    recorder.ondataavailable=e=>{if(e.data.size)chunks.push(e.data);};
+    recorder.onerror=()=>{failed=true;};
+    recorder.onstop=()=>{cleanup();button.disabled=false;button.textContent=failed||!chunks.length?'Recording failed · retry':idle;if(failed||!chunks.length)return;
+      const type=recorder.mimeType||chunks[0].type||'video/webm',url=URL.createObjectURL(new Blob(chunks,{type})),link=document.createElement('a');
+      link.href=url;link.download=title+(canvas.width>canvas.height?'-16x9-':'-9x16-')+Date.now()+(type.startsWith('video/mp4')?'.mp4':'.webm');link.click();setTimeout(()=>URL.revokeObjectURL(url),30000);};
+    LOOPSI=null;paintLoop();if(playing)stop();stepIdx=0;patch.reset?.();
+    videoRecording={recorder};videoCapturePending=false;button.disabled=false;button.textContent='Stop recording';
+    // the patch can hold its opening picture (e.g. the close-up) before the music starts, so the very first frame is that picture
+    const frames=n=>new Promise(resolve=>{let k=0;const f=()=>++k>=n?resolve():requestAnimationFrame(f);requestAnimationFrame(f);});
+    patch.recordHold?.(true);await frames(4);
+    recorder.start(1000);
+    await new Promise(resolve=>setTimeout(resolve,patch.recordHold?250:0));patch.recordHold?.(false);start();
+    watch=setInterval(()=>{if(playing)return;clearInterval(watch);finish=setTimeout(()=>{if(recorder.state!=='inactive')recorder.stop();},3500);},200);
+  }catch(e){cleanup();button.disabled=false;button.textContent='Recording failed · retry';}
+}
 function patchSettingsText(){
   const channels=[...mixIds(),'rret','dret','vinylNoise','master'];
   const mixer=Object.fromEntries(channels.map(id=>{
@@ -312,8 +343,9 @@ function patchSettingsText(){
       setMenu(false);
       exportButton.disabled=true;
       try{
-        const {showPalindromeExport}=await import('./video-export.js?v=8');
-        showPalindromeExport();
+        if(PATCH.frameExport){const {showFrameExport}=await import('./frame-export.js?v=1');showFrameExport(PATCH);} // frame by frame at exactly 60 fps
+        else{const {showPalindromeExport}=await import('./video-export.js?v=8');
+        showPalindromeExport();}
       }catch(error){
         alert('Could not open video export: '+error.message);
       }finally{
@@ -321,7 +353,7 @@ function patchSettingsText(){
       }
     };
     menu.appendChild(exportButton);
-    button.addEventListener('click',()=>{exportButton.hidden=PATCH.id!=='two-ways';});
+    button.addEventListener('click',()=>{exportButton.hidden=PATCH.id!=='two-ways'&&!PATCH.frameExport;exportButton.textContent=PATCH.frameExport?'Export MP4 · 60 fps':'Export MP4';});
   }
   const allVisuals=document.createElement('button');
   allVisuals.type='button';
@@ -414,8 +446,9 @@ function setSkin(light){if(light)document.documentElement.dataset.skin='light';e
   const b=$('skinb');b.setAttribute('aria-label',light?'Switch to dark theme':'Switch to light theme');b.innerHTML=`<i data-ic="${light?'Moon':'Sun'}">${light?'DARK':'LIGHT'}</i>`;fillIcons(b);}
 $('skinb').onclick=()=>setSkin(document.documentElement.dataset.skin!=='light');
 document.addEventListener('keydown',e=>{if(e.target.matches('input,select'))return;
-  if((e.key==='r'||e.key==='R')&&!e.ctrlKey&&!e.metaKey){ // record video, even with the top bar hidden
-    document.querySelector('button[data-record="sequence"]')?.click();
+  if((e.key==='r'||e.key==='R')&&!e.ctrlKey&&!e.metaKey){ // R: the 60 fps frame-by-frame export where the patch has it, otherwise record video; works with the top bar hidden
+    if(PATCH.frameExport){if(!document.querySelector('dialog.export-dialog[open]'))import('./frame-export.js?v=1').then(m=>m.showFrameExport(PATCH));}
+    else document.querySelector('button[data-record="sequence"]')?.click();
   }
   if(e.key==='l'||e.key==='L')toggleLoop();
   if((e.key==='c'||e.key==='C')&&!e.ctrlKey&&!e.metaKey)centerPatch();
