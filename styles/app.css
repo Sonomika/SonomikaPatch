@@ -205,6 +205,11 @@ button,input,select,textarea{font:inherit;color:inherit}
   .scene-meta .scene-title{display:block;min-width:0;overflow:hidden;text-overflow:ellipsis;line-height:28px}
   .sections{flex-wrap:nowrap;justify-content:safe center;overflow-x:auto;scrollbar-width:none;touch-action:pan-x}
 }
+/* phones: the title, time and format selector on one line, the scene selectors on the line underneath */
+@container (max-width:560px){
+  .scene-strip{grid-template-columns:minmax(0,1fr);row-gap:6px}
+  .sections{justify-self:stretch;justify-content:safe center}
+}
 .sections .sec{flex:none}
 .sec sup{color:var(--dim);margin-left:2px;line-height:0}
 .sec.now{background:var(--box);color:var(--ink);border-color:var(--box)}.sec.now sup{color:var(--ondim)}
