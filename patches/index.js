@@ -1,1 +1,1 @@
-const PATCHES=[P1,P12,P9,P11];
+const PATCHES=[P1,P12,P9,P11,P22];
