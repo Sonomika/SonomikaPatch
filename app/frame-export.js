@@ -75,7 +75,7 @@ async function renderFrames(patch,signal,report){
 
   /* ---------- pass 2: the picture, frame by frame ---------- */
   const canvas=patch.recordCanvas(true),width=canvas.width,height=canvas.height;
-  const videoOptions={width,height,bitrate:16e6},audioOptions={numberOfChannels:2,sampleRate:sr,bitrate:192000};
+  const videoOptions={width,height,bitrate:40e6},audioOptions={numberOfChannels:2,sampleRate:sr,bitrate:192000};
   const vOK=await canEncodeVideo('avc',videoOptions),acodec=await canEncodeAudio('aac',audioOptions)?'aac':await canEncodeAudio('opus',audioOptions)?'opus':null; // AAC, or Opus where AAC is missing
   if(!vOK||!acodec){patch.recordCanvas(false);FX.end();throw new Error('This browser cannot encode H.264 video with AAC or Opus audio at this size.');}
   // a silent replay: the clock is ours, and every new audio node is a stand-in, so the scheduled sounds are drawn but not heard

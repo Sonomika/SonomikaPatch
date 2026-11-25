@@ -281,7 +281,8 @@ function patchSettingsText(){
   closeMenu.innerHTML='<i data-ic="X" aria-hidden="true">×</i>';
   closeMenu.onclick=()=>setMenu(false);
   menu.prepend(closeMenu);
-  for(const id of ['viewseg','pos','bpmgrp','skinb','frameSize']){
+  $('frameSize').hidden=true;   // App size removed from the menu: the app always fits the window
+  for(const id of ['viewseg','pos','bpmgrp','skinb']){
     const control=$(id);
     const row=document.createElement('div');
     row.className='mrow';
@@ -338,7 +339,7 @@ function patchSettingsText(){
     const exportButton=document.createElement('button');
     exportButton.type='button';
     exportButton.className='fld';
-    exportButton.textContent='Export MP4';
+    exportButton.textContent='Export MP4 (R)';
     exportButton.onclick=async()=>{
       setMenu(false);
       exportButton.disabled=true;
@@ -353,7 +354,7 @@ function patchSettingsText(){
       }
     };
     menu.appendChild(exportButton);
-    button.addEventListener('click',()=>{exportButton.hidden=PATCH.id!=='two-ways'&&!PATCH.frameExport;exportButton.textContent=PATCH.frameExport?'Export MP4 · 60 fps':'Export MP4';});
+    button.addEventListener('click',()=>{exportButton.hidden=PATCH.id!=='two-ways'&&!PATCH.frameExport;exportButton.textContent='Export MP4 (R)';});
   }
   const allVisuals=document.createElement('button');
   allVisuals.type='button';

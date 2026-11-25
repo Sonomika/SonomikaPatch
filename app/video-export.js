@@ -70,7 +70,7 @@ async function renderPalindrome(layout,{width,height},signal,report){
   const {
     Output,Mp4OutputFormat,BufferTarget,CanvasSource,AudioBufferSource,canEncodeVideo,canEncodeAudio
   }=await import('https://cdn.jsdelivr.net/npm/mediabunny@1.65.2/+esm');
-  const videoOptions={width,height,bitrate:6e6};
+  const videoOptions={width,height,bitrate:20e6};
   const audioOptions={numberOfChannels:2,sampleRate:44100,bitrate:192000};
   const [videoSupported,audioSupported]=await Promise.all([
     canEncodeVideo('avc',videoOptions),canEncodeAudio('aac',audioOptions)
